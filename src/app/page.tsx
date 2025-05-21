@@ -6,9 +6,13 @@ const links = [
   {
     href: "/news",
     label: "ニュース",
-    info: "Cookie超入門、SWR超入門、DB Seeding入門",
+    info: "Cookie超入門、SWR超入門、DB Seeding入門、XSS脆弱性入門",
   },
-  { href: "/shop", label: "ショップ", info: "Cookie入門、SWR入門、zod入門" },
+  {
+    href: "/shop",
+    label: "ショップ",
+    info: "Cookie入門、SWR入門、zod入門、CSRF脆弱性入門",
+  },
   { href: "/login", label: "ログイン", info: "セッションベース認証入門" },
   {
     href: "/signup",

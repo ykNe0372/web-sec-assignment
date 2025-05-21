@@ -14,14 +14,12 @@ export const GET = async (req: NextRequest) => {
     const cookieStore = await cookies();
     const sessionId = cookieStore.get(cKey)?.value;
 
-    console.log(`■ セッションID: ${sessionId}`);
-
     const setSessionCookie = (id: string) => {
       cookieStore.set(cKey, id, {
         path: "/",
-        httpOnly: false,
-        sameSite: "strict",
         maxAge: sessionMaxAge,
+        // httpOnly: false, // 💀 コメントアウトするとXSS脆弱性
+        sameSite: "strict", // 💀 "none" にすると深刻なCSRF脆弱性
         secure: false,
       });
     };
@@ -53,7 +51,7 @@ export const GET = async (req: NextRequest) => {
         payload: [],
         message: "",
       };
-      console.log(`■ 新規セッションを作成しました${session.id}`);
+      // console.log(`■ 新規セッションを作成しました${session.id}`);
       return NextResponse.json(res);
     }
 
@@ -104,11 +102,13 @@ export const PATCH = async (req: NextRequest) => {
     const cookieStore = await cookies();
     const sessionId = cookieStore.get(cKey)?.value;
 
+    console.log(`■ セッションID: ${sessionId}`);
+
     if (!sessionId) {
       const res: ApiResponse<null> = {
         success: false,
         payload: null,
-        message: "セッションが存在しません。処理をキャンセルしました。",
+        message: "X01 セッションが存在しません。処理をキャンセルしました。",
       };
       return NextResponse.json(res);
     }
@@ -121,7 +121,7 @@ export const PATCH = async (req: NextRequest) => {
       const res: ApiResponse<null> = {
         success: false,
         payload: null,
-        message: "セッションが無効です。処理をキャンセルしました。",
+        message: "X02 セッションが無効です。処理をキャンセルしました。",
       };
       return NextResponse.json(res);
     }
@@ -138,7 +138,7 @@ export const PATCH = async (req: NextRequest) => {
       const res: ApiResponse<null> = {
         success: false,
         payload: null,
-        message: `商品 ${productId} は存在しません。処理をキャンセルしました。`,
+        message: `X03 商品 ${productId} は存在しません。処理をキャンセルしました。`,
       };
       return NextResponse.json(res);
     }
@@ -188,7 +188,7 @@ export const PATCH = async (req: NextRequest) => {
     const res: ApiResponse<null> = {
       success: false,
       payload: null,
-      message: "カートの更新に失敗しました",
+      message: "X04 カートの更新に失敗しました",
     };
     return NextResponse.json(res);
   }

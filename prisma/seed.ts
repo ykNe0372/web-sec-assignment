@@ -57,6 +57,8 @@ async function main() {
   await prisma.user.deleteMany();
   await prisma.session.deleteMany();
 
+  await prisma.stolenContent.deleteMany();
+
   await prisma.newsItem.deleteMany();
 
   await prisma.cartSession.deleteMany();

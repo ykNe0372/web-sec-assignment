@@ -53,7 +53,12 @@ model Session {
   @@map("sessions")
 }
 
-
+model StolenContent {
+  id          String   @id @default(uuid())
+  content     String
+  createdAt   DateTime  @default(now()) @map("created_at")
+  @@map("stolen_contents")
+}
 
 model NewsItem {
   id          String   @id @default(uuid())

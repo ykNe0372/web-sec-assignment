@@ -22,6 +22,12 @@ const Page: React.FC = () => {
   const [region, setRegion] = useState<Region>(Region.OSAKA);
   const [newsItems, setNewsItems] = useState<NewsItem[]>([]);
   const [regionDisplayName, setRegionDisplayName] = useState<string>("");
+  const [name, setName] = useState<string | null>(null);
+
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    setName(params.get("name"));
+  }, []);
 
   // 初回 と region変更のタイミングでニュース記事を取得【基本的な実装】
   const [isLoading, setIsLoading] = useState(false);
@@ -29,7 +35,7 @@ const Page: React.FC = () => {
     const fetchNews = async () => {
       try {
         setIsLoading(true);
-        const res = await fetch("/api/news", {
+        const res = await fetch(ep, {
           method: "GET",
           credentials: "same-origin", // Cookieも送信
           cache: "no-store",
@@ -83,9 +89,9 @@ const Page: React.FC = () => {
     // Cookieに保存（クライアントサイドで Cookie を直接操作）
     Cookies.set("region", newRegion, {
       expires: 7,
-      path: "/api/news",
-      sameSite: "strict",
-      secure: false, // 本番環境(HTTPS)では true にすべき
+      // path: "/api/news", // 💀 省略すると /
+      // sameSite: "strict", // 💀 document.cookie で参照可能
+      secure: false, // 💀 本番環境(HTTPS)では true にすべき
     });
     // 👆 セキュアに利用する観点から各設定の意味を調べてみてください
   };
@@ -115,6 +121,15 @@ const Page: React.FC = () => {
         <FontAwesomeIcon icon={faSquareRss} className="mr-1.5" />
         Local Tech News ({regionDisplayName})
       </div>
+
+      {name && (
+        <div className="mt-4 ml-4 flex text-sm text-slate-600">
+          {/* あえてサニタイズせずに出力（💀超危険） */}
+          <span dangerouslySetInnerHTML={{ __html: name }} className="mr-1" />
+          さん、こんにちは！
+        </div>
+      )}
+
       <div className="mt-4 ml-4 flex flex-col space-y-2">
         {newsItems.map((p) => (
           <div key={p.id} className="cursor-pointer hover:underline">
@@ -145,8 +160,15 @@ const Page: React.FC = () => {
       </div>
 
       <div className="mt-4 text-sm text-slate-600">
-        ※ デベロッパーツール (F12)
-        を起動して「アプリケーション」から「ストレージ」の「Cookie」を確認してください。
+        <p>
+          ※ デベロッパーツール (F12)
+          を起動して「アプリケーション」から「ストレージ」の「Cookie」を確認してください。
+        </p>
+        <p>※ このコンテンツは、ログインの有無に関係なく機能します。</p>
+        <p className="text-rose-500">
+          ※
+          このコンテンツには、クロスサイトスクリプティング（XSS）が成立し得る深刻な脆弱性が含まれています。
+        </p>
       </div>
     </main>
   );
