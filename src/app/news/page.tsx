@@ -37,7 +37,7 @@ const Page: React.FC = () => {
 
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
-    setName(params.get("name"));
+    setName(params.get("name")); // 💀 サニタイズ（無害化）ぜずに値を格納
   }, []);
 
   useEffect(() => {
@@ -139,7 +139,7 @@ const Page: React.FC = () => {
 
       {name && (
         <div className="mt-4 ml-4 flex text-sm text-slate-600">
-          {/* あえてサニタイズせずに出力（💀超危険） */}
+          {/* サニタイズされていない値を dangerouslySetInnerHTML で出力（💀超危険） */}
           <span dangerouslySetInnerHTML={{ __html: name }} className="mr-1" />
           さん、こんにちは！
         </div>
