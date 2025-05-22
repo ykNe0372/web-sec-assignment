@@ -14,6 +14,7 @@ export const GET = async (req: NextRequest) => {
     const cookieStore = await cookies();
     const sessionId = cookieStore.get(cKey)?.value;
 
+    // Cookie をセットする関数の定義
     const setSessionCookie = (id: string) => {
       cookieStore.set(cKey, id, {
         path: "/",

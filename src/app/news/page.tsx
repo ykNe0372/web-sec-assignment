@@ -24,13 +24,34 @@ const Page: React.FC = () => {
   const [regionDisplayName, setRegionDisplayName] = useState<string>("");
   const [name, setName] = useState<string | null>(null);
 
+  // Cookie をセットする関数の定義
+  const setSessionCookie = useCallback((region: Region) => {
+    Cookies.set("region", region, {
+      expires: 7, // 有効期限（7日間）
+      // path: "/api/news", // 💀 省略すると "/" が設定される
+      // sameSite: "strict", // 💀 document.cookie で参照可能
+      secure: false, // 💀 本番環境(HTTPS)では true にすべき
+    });
+    // 👆 セキュアに利用する観点から各設定の意味を調べてみてください
+  }, []);
+
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
     setName(params.get("name"));
   }, []);
 
+  useEffect(() => {
+    const regionStr = Cookies.get("region");
+    // Cookieが存在しない もしくはデタラメな値の場合は何もしない
+    if (!regionStr || !Object.values(Region).includes(regionStr as Region)) {
+      setSessionCookie(Region.OSAKA);
+      return;
+    }
+    setRegion(regionStr as Region); // Cookieから取得した地域をセット
+  }, []);
+
   // 初回 と region変更のタイミングでニュース記事を取得【基本的な実装】
-  const [isLoading, setIsLoading] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
   useEffect(() => {
     const fetchNews = async () => {
       try {
@@ -87,13 +108,7 @@ const Page: React.FC = () => {
     console.log("newRegion:", newRegion);
     setRegion(newRegion);
     // Cookieに保存（クライアントサイドで Cookie を直接操作）
-    Cookies.set("region", newRegion, {
-      expires: 7,
-      // path: "/api/news", // 💀 省略すると /
-      // sameSite: "strict", // 💀 document.cookie で参照可能
-      secure: false, // 💀 本番環境(HTTPS)では true にすべき
-    });
-    // 👆 セキュアに利用する観点から各設定の意味を調べてみてください
+    setSessionCookie(newRegion);
   };
 
   // データの取得中の画面出力

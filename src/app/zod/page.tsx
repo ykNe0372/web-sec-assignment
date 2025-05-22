@@ -10,16 +10,15 @@ const Page: React.FC = () => {
     password: "123",
     email: "hoge hoge",
     role: "Admin",
-    age: 20, // 余分なフィールド
   };
 
-  // 検証対象のデータ01
+  // 検証対象のデータ02
   const unsafeUserSeed_02 = {
     name: "寝屋川 タヌキ",
     password: "12345",
     email: "tanuki@example.com",
     role: Role.ADMIN,
-    age: 8, // 余分なフィールド
+    age: 8, // 余分なプロパティ（フィールド）
   };
 
   const unsafeUserSeed = unsafeUserSeed_01; // 01 or 02
