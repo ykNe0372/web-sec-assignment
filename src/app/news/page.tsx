@@ -29,7 +29,7 @@ const Page: React.FC = () => {
     Cookies.set("region", region, {
       expires: 7, // 有効期限（7日間）
       // path: "/api/news", // 💀 省略すると "/" が設定される
-      // sameSite: "strict", // 💀 document.cookie で参照可能
+      // sameSite: "strict", // 💀 適切に設定しないとCSRF脆弱性が生じる
       secure: false, // 💀 本番環境(HTTPS)では true にすべき
     });
     // 👆 セキュアに利用する観点から各設定の意味を調べてみてください
@@ -42,7 +42,7 @@ const Page: React.FC = () => {
 
   useEffect(() => {
     const regionStr = Cookies.get("region");
-    // Cookieが存在しない もしくはデタラメな値の場合は何もしない
+    // Cookieが存在しない もしくはデタラメな値の場合は OSAKA をセットする
     if (!regionStr || !Object.values(Region).includes(regionStr as Region)) {
       setSessionCookie(Region.OSAKA);
       return;
