@@ -58,7 +58,7 @@ const Page: React.FC = () => {
         setIsLoading(true);
         const res = await fetch(ep, {
           method: "GET",
-          credentials: "same-origin", // Cookieも送信
+          credentials: "include", // Cookieも送信
           cache: "no-store",
         });
         const data: ApiResponse<NewsItem[]> = await res.json();
