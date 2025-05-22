@@ -6,7 +6,7 @@
 import React, { useState, useEffect, useTransition } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { signupRequestSchema, SignupRequest } from "@/app/_types/Signup";
+import { signupRequestSchema, SignupRequest } from "@/app/_types/SignupRequest";
 import { TextInputField } from "@/app/_components/TextInputField";
 import { ErrorMsgField } from "@/app/_components/ErrorMsgField";
 import { Button } from "@/app/_components/Button";

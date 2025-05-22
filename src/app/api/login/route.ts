@@ -1,6 +1,6 @@
 import { prisma } from "@/libs/prisma";
 import { cookies } from "next/headers";
-import { loginRequestSchema } from "@/app/_types/Login";
+import { loginRequestSchema } from "@/app/_types/LoginRequest";
 import type { UserProfile } from "@/app/_types/UserProfile";
 import type { ApiResponse } from "@/app/_types/ApiResponse";
 import { NextResponse, NextRequest } from "next/server";

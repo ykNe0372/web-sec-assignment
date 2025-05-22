@@ -2,8 +2,8 @@
 
 import { prisma } from "@/libs/prisma";
 import bcrypt from "bcryptjs";
-import { signupRequestSchema } from "@/app/_types/Signup";
-import type { SignupRequest } from "@/app/_types/Signup";
+import { signupRequestSchema } from "@/app/_types/SignupRequest";
+import type { SignupRequest } from "@/app/_types/SignupRequest";
 import type { UserProfile } from "@/app/_types/UserProfile";
 import type { ServerActionResponse } from "@/app/_types/ServerActionResponse";
 

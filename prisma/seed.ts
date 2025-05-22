@@ -9,7 +9,7 @@ const prisma = new PrismaClient();
 async function main() {
   console.log("Seeding database...");
 
-  // ダミーデータを作成
+  // テスト用のユーザ情報の「種」となる userSeeds を作成
   const userSeeds: UserSeed[] = [
     {
       name: "高負荷 耐子",
@@ -37,7 +37,7 @@ async function main() {
     },
   ];
 
-  // userSeedSchemaを使って UserSeeds のバリデーション
+  // userSeedSchema を使って UserSeeds のバリデーション
   try {
     await Promise.all(
       userSeeds.map(async (userSeed, index) => {
@@ -46,6 +46,10 @@ async function main() {
         console.error(
           `Validation error in record ${index}:\n${JSON.stringify(userSeed, null, 2)}`,
         );
+        console.error("▲▲▲ Validation errors ▲▲▲");
+        console.error(
+          JSON.stringify(result.error.flatten().fieldErrors, null, 2),
+        );
         throw new Error(`Validation failed at record ${index}`);
       }),
     );
@@ -53,19 +57,16 @@ async function main() {
     throw error;
   }
 
-  // UserテーブルとSessionテーブルの全データを削除
+  // 各テーブルの全レコードを削除
   await prisma.user.deleteMany();
   await prisma.session.deleteMany();
-
   await prisma.stolenContent.deleteMany();
-
   await prisma.newsItem.deleteMany();
-
   await prisma.cartSession.deleteMany();
   await prisma.product.deleteMany();
   await prisma.cartItem.deleteMany();
 
-  // Userテーブルにダミーデータを挿入
+  // ユーザ（user）テーブルにテストデータを挿入
   await prisma.user.createMany({
     data: userSeeds.map((userSeed) => ({
       id: uuid(),
@@ -76,7 +77,7 @@ async function main() {
     })),
   });
 
-  // 商品（Product）テーブルにダミーデータを挿入
+  // 商品（product）テーブルにテストデータを挿入
   await prisma.product.createMany({
     data: [
       {

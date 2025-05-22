@@ -3,7 +3,7 @@
 import React, { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { LoginRequest, loginRequestSchema } from "@/app/_types/Login";
+import { LoginRequest, loginRequestSchema } from "@/app/_types/LoginRequest";
 import { UserProfile, userProfileSchema } from "../_types/UserProfile";
 import { TextInputField } from "@/app/_components/TextInputField";
 import { ErrorMsgField } from "@/app/_components/ErrorMsgField";

@@ -19,7 +19,7 @@ export const GET = async (req: NextRequest) => {
         path: "/",
         maxAge: sessionMaxAge,
         // httpOnly: false, // 💀 コメントアウトするとXSS脆弱性
-        sameSite: "strict", // 💀 "none" にすると深刻なCSRF脆弱性
+        sameSite: "strict", // 💀 "none" にするとCSRF脆弱性
         secure: false,
       });
     };

@@ -21,8 +21,8 @@ cd web-sec-playground-1
 
 ```
 git clone https://github.com/TakeshiWada1980/web-sec-playground-1.git hoge
+cd hoge
 ```
-
 
 ### 2. 依存関係のインストール
 
