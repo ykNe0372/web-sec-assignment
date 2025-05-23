@@ -30,7 +30,15 @@ cd hoge
 npm i
 ```
 
-### 3. データベースの初期化
+### 3. 環境変数の設定ファイル (.env) の作成
+
+プロジェクトのルートフォルダに `.env` (環境変数の設定ファイル) を新規作成して以下の内容を記述してください。
+
+```
+DATABASE_URL="file:./app.db"
+```
+
+### 4. データベースの初期化
 
 ```bash
 npx prisma db push
@@ -38,13 +46,13 @@ npx prisma generate
 npx prisma db seed
 ```
 
-### 4. 開発サーバの起動
+### 5. 開発サーバの起動
 
 ```bash
 npm run dev
 ```
 
-### 5. ビルドと実行
+### 6. ビルドと実行
 
 ```bash
 npm run build
