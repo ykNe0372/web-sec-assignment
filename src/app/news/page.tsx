@@ -48,7 +48,7 @@ const Page: React.FC = () => {
       return;
     }
     setRegion(regionStr as Region); // Cookieから取得した地域をセット
-  }, []);
+  }, [setSessionCookie]);
 
   // 初回 と region変更のタイミングでニュース記事を取得【基本的な実装】
   const [isLoading, setIsLoading] = useState(true);

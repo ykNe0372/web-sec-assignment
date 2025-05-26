@@ -7,7 +7,6 @@
 
 // DBの確認は
 // npx prisma studio
-
 generator client {
   provider = "prisma-client-js"
 }
@@ -29,14 +28,16 @@ enum Region {
 }
 
 model User {
-  id        String    @id @default(uuid())
-  email     String    @unique
-  password  String
-  name      String
-  role      Role      @default(USER)
-  createdAt   DateTime  @default(now()) @map("created_at")
-  updatedAt   DateTime  @updatedAt @map("updated_at")
-  lastLoginAt DateTime? @map("last_login_at")
+  id           String      @id @default(uuid())
+  email        String      @unique
+  password     String
+  name         String
+  role         Role        @default(USER)
+  aboutSlug    String?     @map("about_slug") @unique
+  aboutContent String      @default("") 
+  createdAt    DateTime  @default(now()) @map("created_at")
+  updatedAt    DateTime  @updatedAt @map("updated_at")
+  lastLoginAt  DateTime? @map("last_login_at")
 
   sessions     Session[]
 

@@ -1,18 +1,24 @@
 import { StatusCodes, getReasonPhrase } from "http-status-codes";
 
+type SymbolicStatusKeys = {
+  [K in keyof typeof StatusCodes]: (typeof StatusCodes)[K] extends number
+    ? K
+    : never;
+}[keyof typeof StatusCodes];
+
 type StatusPhrases = {
-  [key in keyof typeof StatusCodes]: string;
+  [key in SymbolicStatusKeys]: string;
 };
 
-// StatusPhrasesオブジェクトを作成
 const StatusPhrases: StatusPhrases = Object.keys(StatusCodes)
   .filter(
-    (key) => typeof StatusCodes[key as keyof typeof StatusCodes] === "number",
+    (key): key is SymbolicStatusKeys =>
+      typeof key === "string" &&
+      typeof StatusCodes[key as keyof typeof StatusCodes] === "number",
   )
   .reduce((acc, key) => {
     const code = StatusCodes[key as keyof typeof StatusCodes] as number;
-    // @ts-ignore: next-line
-    acc[key as keyof typeof StatusCodes] = getReasonPhrase(code);
+    acc[key] = getReasonPhrase(code);
     return acc;
   }, {} as StatusPhrases);
 

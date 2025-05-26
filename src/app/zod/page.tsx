@@ -1,5 +1,6 @@
 "use client";
-import React from "react";
+
+import React, { useEffect } from "react";
 import { userSeedSchema } from "@/app/_types/UserSeed";
 import { Role } from "@/app/_types/Role";
 
@@ -18,23 +19,27 @@ const Page: React.FC = () => {
     password: "12345",
     email: "tanuki@example.com",
     role: Role.ADMIN,
-    age: 8, // 余分なプロパティ（フィールド）
+    age: 8, // 余分なプロパティ
   };
 
-  const unsafeUserSeed = unsafeUserSeed_01; // 01 or 02
+  const unsafeUserSeed = unsafeUserSeed_02; // 01 or 02
 
-  // 検証 (バリデーション)
-  const result = userSeedSchema.safeParse(unsafeUserSeed);
-  if (!result.success) {
-    console.log("▼ Validation NG ▼");
-    console.log(JSON.stringify(result.error.flatten().fieldErrors, null, 2));
-  }
-  const userSeed = result.data ?? null;
-  if (userSeed) {
-    console.log("▼ Validation OK ▼");
-    console.log(JSON.stringify(userSeed, null, 2));
-  }
-  // 👆 開発モードでは同じ処理が2回走るためログが重複します（Reactの特性）。
+  useEffect(() => {
+    const result = userSeedSchema.safeParse(unsafeUserSeed);
+
+    if (!result.success) {
+      console.log("▼ Validation NG ▼");
+      console.log(JSON.stringify(result.error.flatten().fieldErrors, null, 2));
+    }
+
+    const userSeed = result.data ?? null;
+    if (userSeed) {
+      console.log("▼ Validation OK ▼");
+      console.log(JSON.stringify(userSeed, null, 2));
+    }
+
+    console.log("検証結果（バリデーション結果）を確認してください。");
+  }, [unsafeUserSeed]);
 
   return (
     <main>

@@ -3,6 +3,7 @@
 import { prisma } from "@/libs/prisma";
 import bcrypt from "bcryptjs";
 import { signupRequestSchema } from "@/app/_types/SignupRequest";
+import { userProfileSchema } from "@/app/_types/UserProfile";
 import type { SignupRequest } from "@/app/_types/SignupRequest";
 import type { UserProfile } from "@/app/_types/UserProfile";
 import type { ServerActionResponse } from "@/app/_types/ServerActionResponse";
@@ -28,7 +29,7 @@ export const signupServerAction = async (
       // 認証メールを送信するなどの方法が望ましい
       return {
         success: false,
-        data: null,
+        payload: null,
         message: "このメールアドレスは既に使用されています。",
       };
     }
@@ -51,12 +52,7 @@ export const signupServerAction = async (
     // 💀 パスワードは無論、不要な情報はレスポンスしない。
     const res: ServerActionResponse<UserProfile> = {
       success: true,
-      data: {
-        id: user.id,
-        email: user.email,
-        name: user.name,
-        role: user.role,
-      },
+      payload: userProfileSchema.parse(user), // 余分なプロパティを削除,
       message: "",
     };
     return res;
@@ -65,7 +61,7 @@ export const signupServerAction = async (
     console.error(errorMsg);
     return {
       success: false,
-      data: null,
+      payload: null,
       message: errorMsg,
       // 💀 エラーメッセージはユーザに見せない方が良い
       // システム内部構造や依存関係をユーザに漏らす可能性がある

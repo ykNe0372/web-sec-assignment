@@ -59,7 +59,7 @@ const Page: React.FC = () => {
       router.refresh();
       console.log("サインアップ完了");
     }
-  }, [isSignUpCompleted, router]);
+  }, [formMethods, isSignUpCompleted, router]);
 
   // フォームの送信処理
   const onSubmit = async (signupRequest: SignupRequest) => {

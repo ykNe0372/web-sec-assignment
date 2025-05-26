@@ -19,6 +19,11 @@ const links = [
     label: "サインアップ",
     info: "ServerActions (Custom Invocation) 入門",
   },
+  {
+    href: "/member/about",
+    label: "公開プロフィールの確認・編集",
+    info: "ログインが必要なコンテンツ",
+  },
 ];
 
 const Page: React.FC = () => {

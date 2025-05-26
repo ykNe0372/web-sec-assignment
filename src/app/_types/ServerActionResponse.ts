@@ -1,6 +1,6 @@
-export interface ServerActionResponse<T> {
+export type ServerActionResponse<T> = {
   success: boolean;
-  data: T;
+  payload: T;
   message: string; // 主にエラーメッセージなど
   metadata?: string; // JSON形式のメタ情報
-}
+};
