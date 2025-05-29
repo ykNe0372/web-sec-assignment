@@ -1,11 +1,6 @@
-// import { cookies } from "next/headers";
-// import { prisma } from "@/libs/prisma";
 import { SignJWT, jwtVerify } from "jose";
-// import type { JWTPayload as JoseJwtPayload } from "jose";
-// import type { JwtPayload } from "@/app/_types/JWTPayload";
 import type { UserProfile } from "@/app/_types/UserProfile";
 import { userProfileSchema } from "@/app/_types/UserProfile";
-// import { use } from "react";
 //
 /**
  * JWT (JSON Web Token) を新規発行
