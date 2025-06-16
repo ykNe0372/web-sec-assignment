@@ -1,9 +1,12 @@
 import { prisma } from "@/libs/prisma";
-import { cookies } from "next/headers";
 import { loginRequestSchema } from "@/app/_types/LoginRequest";
+import { userProfileSchema } from "@/app/_types/UserProfile";
 import type { UserProfile } from "@/app/_types/UserProfile";
 import type { ApiResponse } from "@/app/_types/ApiResponse";
 import { NextResponse, NextRequest } from "next/server";
+import { createSession } from "@/app/api/_helper/createSession";
+import { createJwt } from "@/app/api/_helper/createJwt";
+import { AUTH } from "@/config/auth";
 
 // キャッシュを無効化して毎回最新情報を取得
 export const dynamic = "force-dynamic";
@@ -50,43 +53,27 @@ export const POST = async (req: NextRequest) => {
       return NextResponse.json(res);
     }
 
-    // セッションIDの作成
-    const sessionTokenMaxAge = 60 * 60 * 3; // 3H
-    // const sessionTokenMaxAge = 60; // 1分
+    const tokenMaxAgeSeconds = 60 * 60 * 3; // 3時間
 
-    // 💀 当該ユーザのセッションが既にDBに存在するなら消す処理を入れるべき
-    // await prisma.session.deleteMany({ where: { userId: user.id } });
-    // 👆 ただし、これだと全ての端末のセッションが無効になる ✍ どうすればよい？
-    const session = await prisma.session.create({
-      data: {
-        id: crypto.randomUUID(),
-        userId: user.id,
-        expiresAt: new Date(Date.now() + sessionTokenMaxAge * 1000),
-      },
-    });
-
-    // クッキーを設定
-    const cookieStore = await cookies();
-    // 💀 session_id というクッキー名が典型的すぎて狙われやすい（XSSでの標的）
-    cookieStore.set("session_id", session.id, {
-      path: "/", // ルートパス以下で有効
-      httpOnly: true,
-      sameSite: "strict",
-      maxAge: sessionTokenMaxAge,
-      secure: false, // 💀 secure: false は開発用。deploy 時は要切替！
-    });
-
-    const res: ApiResponse<UserProfile> = {
-      success: true,
-      payload: {
-        id: user.id,
-        email: user.email,
-        name: user.name,
-        role: user.role,
-      },
-      message: "",
-    };
-    return NextResponse.json(res);
+    if (AUTH.isSession) {
+      // ■■ セッションベース認証の処理 ■■
+      await createSession(user.id, tokenMaxAgeSeconds);
+      const res: ApiResponse<UserProfile> = {
+        success: true,
+        payload: userProfileSchema.parse(user), // 余分なプロパティを削除
+        message: "",
+      };
+      return NextResponse.json(res);
+    } else {
+      // ■■ トークンベース認証の処理 ■■
+      const jwt = await createJwt(user, tokenMaxAgeSeconds);
+      const res: ApiResponse<string> = {
+        success: true,
+        payload: jwt,
+        message: "",
+      };
+      return NextResponse.json(res);
+    }
   } catch (e) {
     const errorMsg = e instanceof Error ? e.message : "Internal Server Error";
     console.error(errorMsg);

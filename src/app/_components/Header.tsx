@@ -1,7 +1,6 @@
 "use client";
 
 import { useAuth } from "@/app/_hooks/useAuth";
-import { useState, useEffect } from "react";
 import NextLink from "next/link";
 
 import { useRouter } from "next/navigation";
@@ -9,16 +8,11 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faUserLock } from "@fortawesome/free-solid-svg-icons";
 
 import { twMerge } from "tailwind-merge";
+import { AUTH } from "@/config/auth";
 
 export const Header: React.FC = () => {
   const { userProfile, logout } = useAuth();
   const router = useRouter();
-
-  // const logout = async () => {
-  //   await logoutAction();
-  //   setUserProfile(null);
-  //   window.location.href = "/";
-  // };
 
   return (
     <header>
@@ -35,6 +29,9 @@ export const Header: React.FC = () => {
               <FontAwesomeIcon icon={faUserLock} className="mr-1.5" />
               ガチガチにセキュアな設計
             </NextLink>
+            <span className="ml-1 text-xs font-normal">
+              {AUTH.isSession ? "- Session Auth" : "- JWT Auth"}
+            </span>
           </div>
           <div className="flex items-center space-x-6">
             <div

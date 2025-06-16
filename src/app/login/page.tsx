@@ -13,11 +13,16 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { twMerge } from "tailwind-merge";
 import NextLink from "next/link";
 import { ApiResponse } from "../_types/ApiResponse";
+import { decodeJwt } from "jose";
+import { mutate } from "swr";
+import { useRouter } from "next/navigation";
+import { AUTH } from "@/config/auth";
 
 const Page: React.FC = () => {
   const c_Email = "email";
   const c_Password = "password";
 
+  const router = useRouter();
   const [isPending, setIsPending] = useState(false);
   const [userProfile, setUserProfile] = useState<UserProfile | null>(null);
   const [isLoginCompleted, setIsLoginCompleted] = useState(false);
@@ -43,7 +48,7 @@ const Page: React.FC = () => {
     const searchParams = new URLSearchParams(window.location.search);
     const email = searchParams.get(c_Email);
     formMethods.setValue(c_Email, email || "");
-  }, []);
+  }, [formMethods]);
 
   // ルートエラーメッセージのクリアに関する設定
   useEffect(() => {
@@ -58,9 +63,11 @@ const Page: React.FC = () => {
   // ログイン完了後のリダイレクト処理
   useEffect(() => {
     if (isLoginCompleted) {
-      window.location.href = "/";
+      // window.location.href = "/";
+      router.replace("/");
+      router.refresh();
     }
-  }, [isLoginCompleted]);
+  }, [isLoginCompleted, router]);
 
   // フォームの送信処理
   const onSubmit = async (formValues: LoginRequest) => {
@@ -82,14 +89,23 @@ const Page: React.FC = () => {
 
       if (!res.ok) return;
 
-      const body = (await res.json()) as ApiResponse<UserProfile | null>;
-
+      const body = (await res.json()) as ApiResponse<unknown>;
       if (!body.success) {
         setRootError(body.message);
         return;
       }
+
+      if (AUTH.isSession) {
+        // ■■ セッションベース認証の処理 ■■
+        setUserProfile(userProfileSchema.parse(body.payload));
+      } else {
+        // ■■ トークンベース認証の処理 ■■
+        const jwt = body.payload as string;
+        localStorage.setItem("jwt", jwt); // JWT をローカルストレージに保存
+        setUserProfile(userProfileSchema.parse(decodeJwt(jwt)));
+      }
+      mutate("/api/auth", body);
       setIsLoginCompleted(true);
-      setUserProfile(userProfileSchema.parse(body.payload));
     } catch (e) {
       const errorMsg =
         e instanceof Error ? e.message : "予期せぬエラーが発生しました。";

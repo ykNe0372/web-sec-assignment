@@ -1,10 +1,9 @@
-// /app/_libs/getValidUserIdFromSession.ts
 import { cookies } from "next/headers";
 import { prisma } from "@/libs/prisma";
 
 /**
- * セッションID付きクッキーから userId を取得（期限延長あり）
- * 無効な場合はセッションもクッキーも削除する
+ * Cookie の sessionId から userId を取得（期限延長あり）
+ * 無効な場合は DB の Session レコードも、Cookie も削除する
  */
 export const verifySession = async (): Promise<string | null> => {
   const cookieStore = await cookies();
@@ -18,7 +17,7 @@ export const verifySession = async (): Promise<string | null> => {
 
   const now = new Date();
   if (!session || session.expiresAt <= now) {
-    // 無効なセッションは削除
+    // 無効なセッションは削除 空文字を上書き・有効期限0
     await prisma.session.deleteMany({ where: { id: sessionId } });
     cookieStore.set("session_id", "", {
       path: "/",
@@ -31,8 +30,8 @@ export const verifySession = async (): Promise<string | null> => {
   }
 
   // セッションの有効期限を延長
-  const sessionTokenMaxAge = 60 * 60 * 3; // 3時間
-  const newExpiry = new Date(now.getTime() + sessionTokenMaxAge * 1000);
+  const tokenMaxAgeSeconds = 60 * 60 * 3; // 3時間
+  const newExpiry = new Date(now.getTime() + tokenMaxAgeSeconds * 1000);
   await prisma.session.update({
     where: { id: sessionId },
     data: { expiresAt: newExpiry },
@@ -42,7 +41,7 @@ export const verifySession = async (): Promise<string | null> => {
     path: "/",
     httpOnly: true,
     sameSite: "strict",
-    maxAge: sessionTokenMaxAge,
+    maxAge: tokenMaxAgeSeconds,
     secure: false,
   });
 
