@@ -5,7 +5,7 @@ import NextLink from "next/link";
 
 import { useRouter } from "next/navigation";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faChalkboardUser } from "@fortawesome/free-solid-svg-icons";
+import { faUserLock } from "@fortawesome/free-solid-svg-icons";
 
 import { twMerge } from "tailwind-merge";
 import { AUTH } from "@/config/auth";
@@ -26,27 +26,36 @@ export const Header: React.FC = () => {
         >
           <div>
             <NextLink href="/">
-              <FontAwesomeIcon icon={faChalkboardUser} className="mr-1.5" />
-              WebSecPlayground
+              <FontAwesomeIcon icon={faUserLock} className="mr-1.5" />
+              ガチガチにセキュアな設計
             </NextLink>
             <span className="ml-1 text-xs font-normal">
               {AUTH.isSession ? "- Session Auth" : "- JWT Auth"}
             </span>
           </div>
-          {userProfile ? (
-            <div className="ml-2 text-sm text-slate-400">
-              <div className="flex items-center gap-x-2">
-                <div className="text-slate-200">{userProfile.name}</div>
-                <div
-                  className={twMerge("cursor-pointer hover:text-white")}
-                  onClick={logout}
-                >
-                  ログアウト
+          <div className="flex items-center space-x-6">
+            <div
+              className={twMerge("text-sm text-slate-400 cursor-pointer hover:text-white ")}
+              onClick={() => {
+                router.push("/signup");
+              }}
+              >
+              Sign up
+            </div>
+            {userProfile ? (
+              <div className="ml-2 text-sm text-slate-400">
+                <div className="flex items-center gap-x-2">
+                  <div className="text-slate-200">{userProfile.name}</div>
+                  <div
+                    className={twMerge("cursor-pointer hover:text-white")}
+                    onClick={logout}
+                    >
+                    Sign out
+                  </div>
                 </div>
               </div>
-            </div>
-          ) : (
-            <div
+            ) : (
+              <div
               className={twMerge(
                 "ml-2 text-sm text-slate-400",
                 "cursor-pointer hover:text-white",
@@ -54,10 +63,11 @@ export const Header: React.FC = () => {
               onClick={() => {
                 router.push("/login");
               }}
-            >
-              ログイン
-            </div>
-          )}
+              >
+                Sign in
+              </div>
+            )}
+          </div>
         </div>
       </div>
     </header>
