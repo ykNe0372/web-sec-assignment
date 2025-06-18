@@ -53,6 +53,18 @@ export const POST = async (req: NextRequest) => {
       return NextResponse.json(res);
     }
 
+    if (user.totpSecret) {
+      const res: ApiResponse<null> = {
+        success: true,
+        payload: null,
+        require2fa: true,
+        userId: user.id,
+        userEmail: user.email,
+        message: "",
+      };
+      return NextResponse.json(res);
+    }
+
     const tokenMaxAgeSeconds = 60 * 60 * 3; // 3時間
 
     if (AUTH.isSession) {

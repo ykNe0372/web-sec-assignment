@@ -95,6 +95,11 @@ const Page: React.FC = () => {
         return;
       }
 
+      if (body.require2fa && body.userId && body.userEmail) {
+        router.replace(`/login/2fa?userId=${encodeURIComponent(body.userId)}&userEmail=${encodeURIComponent(body.userEmail)}`);
+        return;
+      }
+
       if (AUTH.isSession) {
         // ■■ セッションベース認証の処理 ■■
         setUserProfile(userProfileSchema.parse(body.payload));
@@ -177,11 +182,8 @@ const Page: React.FC = () => {
         <div>
           <div className="mt-4 flex items-center gap-x-2">
             <FontAwesomeIcon icon={faSpinner} spin />
-            <div>ようこそ、{userProfile?.name} さん。</div>
+            <div>ただいま処理中です...</div>
           </div>
-          <NextLink href="/" className="text-blue-500 hover:underline">
-            自動的に画面が切り替わらないときはこちらをクリックしてください。
-          </NextLink>
         </div>
       )}
     </main>
