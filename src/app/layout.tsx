@@ -19,7 +19,7 @@ type Props = {
 const RootLayout: React.FC<Props> = async (props) => {
   return (
     <html lang="ja">
-      <body>
+      <body className="vsc-initialized">
         <AuthProvider>
           <Header />
           <main className="mx-4 mt-2 max-w-3xl md:mx-auto">
