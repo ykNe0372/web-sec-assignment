@@ -6,7 +6,6 @@ import QRCode from "qrcode";
 const prisma = new PrismaClient();
 
 export async function POST(req: NextRequest) {
-  // 認証済みユーザーIDを取得する処理を追加してください
   const { userId, userEmail } = await req.json();
 
   // 既存のTOTPシークレットがなければ生成
@@ -37,7 +36,7 @@ export async function POST(req: NextRequest) {
   const qrCodeDataUrl = await QRCode.toDataURL(otpauthUrl);
 
   return NextResponse.json({
-    qrCodeDataUrl, // これをimgタグのsrcに使う
-    otpauthUrl,    // 参考までに返却
+    qrCodeDataUrl,
+    otpauthUrl,
   });
 }

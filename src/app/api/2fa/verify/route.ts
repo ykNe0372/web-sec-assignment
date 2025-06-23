@@ -18,11 +18,10 @@ export async function POST(req: NextRequest) {
     secret: user.totpSecret,
     encoding: "base32",
     token, // 入力された6桁コード
-    window: 1, // 時間のズレ許容（必要に応じて調整）
+    window: 1, // 時間のズレ許容
   });
 
   if (verified) {
-    // 必要なら2FA有効フラグを保存
     // await prisma.user.update({ where: { id: userId }, data: { ... } });
     return NextResponse.json({ success: true });
   } else {
