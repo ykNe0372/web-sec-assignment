@@ -21,6 +21,7 @@ const Page: React.FC = () => {
   const c_Name = "name";
   const c_Email = "email";
   const c_Password = "password";
+  const c_PasswordConfirm = "passwordConfirm";
 
   const router = useRouter();
 
@@ -34,6 +35,9 @@ const Page: React.FC = () => {
   });
   const fieldErrors = formMethods.formState.errors;
 
+  const password = formMethods.watch("password");
+  const passwordConfirm = formMethods.watch("passwordConfirm");
+
   // ルートエラー（サーバサイドで発生した認証エラー）の表示設定の関数
   const setRootError = (errorMsg: string) => {
     formMethods.setError("root", {
@@ -41,6 +45,10 @@ const Page: React.FC = () => {
       message: errorMsg,
     });
   };
+
+  useEffect(() => {
+    formMethods.trigger("password");
+  }, [password, passwordConfirm])
 
   // ルートエラーメッセージのクリアに関する設定
   useEffect(() => {
@@ -138,6 +146,23 @@ const Page: React.FC = () => {
           />
           <ErrorMsgField msg={fieldErrors.password?.message} />
           <ErrorMsgField msg={fieldErrors.root?.message} />
+        </div>
+
+        {/* パスワード再入力欄 */}
+        <div>
+          <label htmlFor={c_PasswordConfirm} className="mb-2 block font-bold">
+            パスワード再入力
+          </label>
+          <TextInputField
+            {...formMethods.register(c_PasswordConfirm)}
+            id={c_PasswordConfirm}
+            placeholder="*****"
+            type="password"
+            disabled={isPending || isSignUpCompleted}
+            error={!!fieldErrors.passwordConfirm}
+            autoComplete="off"
+          />
+          <ErrorMsgField msg={fieldErrors.passwordConfirm?.message} />
         </div>
 
         <Button
