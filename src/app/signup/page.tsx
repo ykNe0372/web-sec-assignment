@@ -12,7 +12,7 @@ import { ErrorMsgField } from "@/app/_components/ErrorMsgField";
 import { Button } from "@/app/_components/Button";
 import NextLink from "next/link";
 import { useRouter } from "next/navigation";
-import { faSpinner, faPenNib } from "@fortawesome/free-solid-svg-icons";
+import { faEye, faEyeSlash, faSpinner, faPenNib } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 
 import { signupServerAction } from "@/app/_actions/signup";
@@ -21,11 +21,14 @@ const Page: React.FC = () => {
   const c_Name = "name";
   const c_Email = "email";
   const c_Password = "password";
+  const c_PasswordConfirm = "passwordConfirm";
 
   const router = useRouter();
 
   const [isPending, startTransition] = useTransition();
   const [isSignUpCompleted, setIsSignUpCompleted] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
+  const [showPasswordConfirm, setShowPasswordConfirm] = useState(false);
 
   // フォーム処理関連の準備と設定
   const formMethods = useForm<SignupRequest>({
@@ -34,6 +37,9 @@ const Page: React.FC = () => {
   });
   const fieldErrors = formMethods.formState.errors;
 
+  const password = formMethods.watch("password");
+  const passwordConfirm = formMethods.watch("passwordConfirm");
+
   // ルートエラー（サーバサイドで発生した認証エラー）の表示設定の関数
   const setRootError = (errorMsg: string) => {
     formMethods.setError("root", {
@@ -41,6 +47,11 @@ const Page: React.FC = () => {
       message: errorMsg,
     });
   };
+
+  useEffect(() => {
+    formMethods.trigger("password");
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [password, passwordConfirm])
 
   // ルートエラーメッセージのクリアに関する設定
   useEffect(() => {
@@ -127,17 +138,56 @@ const Page: React.FC = () => {
           <label htmlFor={c_Password} className="mb-2 block font-bold">
             パスワード
           </label>
-          <TextInputField
-            {...formMethods.register(c_Password)}
-            id={c_Password}
-            placeholder="*****"
-            type="password"
-            disabled={isPending || isSignUpCompleted}
-            error={!!fieldErrors.password}
-            autoComplete="off"
-          />
+          <div className="relative">
+            <TextInputField
+              {...formMethods.register(c_Password)}
+              id={c_Password}
+              placeholder="*****"
+              type={showPassword ? "text" : "password"}
+              disabled={isPending || isSignUpCompleted}
+              error={!!fieldErrors.password}
+              autoComplete="off"
+            />
+            <button
+              type="button"
+              tabIndex={-1}
+              className="absolute right-2 top-1/2 -translate-y-1/2 text-gray-500"
+              onClick={() => setShowPassword((v) => !v)}
+              aria-label={showPassword ? "パスワードを非表示" : "パスワードを表示"}
+            >
+              <FontAwesomeIcon icon={showPassword ? faEyeSlash : faEye} />
+            </button>
+          </div>
           <ErrorMsgField msg={fieldErrors.password?.message} />
           <ErrorMsgField msg={fieldErrors.root?.message} />
+        </div>
+
+        {/* パスワード再入力欄 */}
+        <div>
+          <label htmlFor={c_PasswordConfirm} className="mb-2 block font-bold">
+            パスワード再入力
+          </label>
+          <div className="relative">
+            <TextInputField
+              {...formMethods.register(c_PasswordConfirm)}
+              id={c_PasswordConfirm}
+              placeholder="*****"
+              type={showPasswordConfirm ? "text" : "password"}
+              disabled={isPending || isSignUpCompleted}
+              error={!!fieldErrors.passwordConfirm}
+              autoComplete="off"
+            />
+            <button
+              type="button"
+              tabIndex={-1}
+              className="absolute right-2 top-1/2 -translate-y-1/2 text-gray-500"
+              onClick={() => setShowPasswordConfirm((v) => !v)}
+              aria-label={showPasswordConfirm ? "パスワードを非表示" : "パスワードを表示"}
+            >
+              <FontAwesomeIcon icon={showPasswordConfirm ? faEyeSlash : faEye} />
+            </button>
+          </div>
+          <ErrorMsgField msg={fieldErrors.passwordConfirm?.message} />
         </div>
 
         <Button

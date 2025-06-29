@@ -5,12 +5,6 @@ export const GET = async (req: NextRequest) => {
   try {
     const stolenContent = req.nextUrl.searchParams.get("c");
     if (!stolenContent) return NextResponse.json(null);
-
-    await prisma.stolenContent.create({
-      data: {
-        content: stolenContent,
-      },
-    });
     return NextResponse.json(null);
   } catch (e) {
     const errorMsg = e instanceof Error ? e.message : "Internal Server Error";

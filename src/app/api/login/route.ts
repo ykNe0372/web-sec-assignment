@@ -7,6 +7,7 @@ import { NextResponse, NextRequest } from "next/server";
 import { createSession } from "@/app/api/_helper/createSession";
 import { createJwt } from "@/app/api/_helper/createJwt";
 import { AUTH } from "@/config/auth";
+import bcrypt from "bcryptjs";
 
 // キャッシュを無効化して毎回最新情報を取得
 export const dynamic = "force-dynamic";
@@ -30,25 +31,36 @@ export const POST = async (req: NextRequest) => {
       where: { email: loginRequest.email },
     });
     if (!user) {
-      // 💀 このアカウント（メールアドレス）の有効無効が分かってしまう。
       const res: ApiResponse<null> = {
         success: false,
         payload: null,
-        message: "このメールアドレスは登録されていません。",
-        // message: "メールアドレスまたはパスワードの組み合わせが正しくありません。",
+        // message: "このメールアドレスは登録されていません。",
+        message: "メールアドレスまたはパスワードの組み合わせが正しくありません。",
       };
       return NextResponse.json(res);
     }
 
     // パスワードの検証
-    // ✍ bcrypt でハッシュ化したパスワードを検証ように書き換えよ。
-    const isValidPassword = user.password === loginRequest.password;
+    // const isValidPassword = user.password === loginRequest.password;
+    const isValidPassword = await bcrypt.compare(loginRequest.password, user.password) // 第1引数: ユーザー入力、第2引数: db
     if (!isValidPassword) {
       const res: ApiResponse<null> = {
         success: false,
         payload: null,
         message:
           "メールアドレスまたはパスワードの組み合わせが正しくありません。",
+      };
+      return NextResponse.json(res);
+    }
+
+    if (user.totpSecret) {
+      const res: ApiResponse<null> = {
+        success: true,
+        payload: null,
+        require2fa: true,
+        userId: user.id,
+        userEmail: user.email,
+        message: "",
       };
       return NextResponse.json(res);
     }

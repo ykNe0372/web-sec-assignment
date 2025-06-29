@@ -8,7 +8,7 @@ import { UserProfile, userProfileSchema } from "../_types/UserProfile";
 import { TextInputField } from "@/app/_components/TextInputField";
 import { ErrorMsgField } from "@/app/_components/ErrorMsgField";
 import { Button } from "@/app/_components/Button";
-import { faSpinner, faRightToBracket } from "@fortawesome/free-solid-svg-icons";
+import { faEye, faEyeSlash, faSpinner, faRightToBracket } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { twMerge } from "tailwind-merge";
 import NextLink from "next/link";
@@ -26,6 +26,8 @@ const Page: React.FC = () => {
   const [isPending, setIsPending] = useState(false);
   const [userProfile, setUserProfile] = useState<UserProfile | null>(null);
   const [isLoginCompleted, setIsLoginCompleted] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
+  const [showPasswordConfirm, setShowPasswordConfirm] = useState(false);
 
   // フォーム処理関連の準備と設定
   const formMethods = useForm<LoginRequest>({
@@ -95,6 +97,11 @@ const Page: React.FC = () => {
         return;
       }
 
+      if (body.require2fa && body.userId && body.userEmail) {
+        router.replace(`/login/2fa?userId=${encodeURIComponent(body.userId)}&userEmail=${encodeURIComponent(body.userEmail)}`);
+        return;
+      }
+
       if (AUTH.isSession) {
         // ■■ セッションベース認証の処理 ■■
         setUserProfile(userProfileSchema.parse(body.payload));
@@ -147,15 +154,26 @@ const Page: React.FC = () => {
           <label htmlFor={c_Password} className="mb-2 block font-bold">
             パスワード
           </label>
-          <TextInputField
-            {...formMethods.register(c_Password)}
-            id={c_Password}
-            placeholder="*****"
-            type="password"
-            disabled={isPending || isLoginCompleted}
-            error={!!fieldErrors.password}
-            autoComplete="off"
-          />
+          <div className="relative">
+            <TextInputField
+              {...formMethods.register(c_Password)}
+              id={c_Password}
+              placeholder="*****"
+              type={showPassword ? "text" : "password"}
+              disabled={isPending || isLoginCompleted}
+              error={!!fieldErrors.password}
+              autoComplete="off"
+            />
+            <button
+              type="button"
+              tabIndex={-1}
+              className="absolute right-2 top-1/2 -translate-y-1/2 text-gray-500"
+              onClick={() => setShowPassword((v) => !v)}
+              aria-label={showPassword ? "パスワードを非表示" : "パスワードを表示"}
+            >
+              <FontAwesomeIcon icon={showPassword ? faEyeSlash : faEye} />
+            </button>
+          </div>
           <ErrorMsgField msg={fieldErrors.password?.message} />
           <ErrorMsgField msg={fieldErrors.root?.message} />
         </div>
@@ -177,11 +195,8 @@ const Page: React.FC = () => {
         <div>
           <div className="mt-4 flex items-center gap-x-2">
             <FontAwesomeIcon icon={faSpinner} spin />
-            <div>ようこそ、{userProfile?.name} さん。</div>
+            <div>ただいま処理中です...</div>
           </div>
-          <NextLink href="/" className="text-blue-500 hover:underline">
-            自動的に画面が切り替わらないときはこちらをクリックしてください。
-          </NextLink>
         </div>
       )}
     </main>

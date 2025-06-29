@@ -1,7 +1,11 @@
 import { z } from "zod";
 import { Role } from "./Role";
 
-export const passwordSchema = z.string().min(5);
+export const passwordSchema = z
+  .string()
+  .min(8, "パスワードは8文字以上で入力してください")
+  .max(64, "パスワードは64文字以内で入力してください")
+  .regex(/^[\x21-\x7E]+$/, "パスワードは半角英数字記号のみ利用できます");
 export const emailSchema = z.string().email();
 export const userNameSchema = z.string().min(1);
 export const roleSchema = z.nativeEnum(Role);
