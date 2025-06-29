@@ -41,7 +41,7 @@ export const createSession = async (
   cookieStore.set("session_id", session.id, {
     path: "/",
     httpOnly: true,
-    sameSite: "lax",
+    sameSite: "strict",
     maxAge: tokenMaxAgeSeconds,
     secure: false, // 💀 secure: false は開発用。deploy 時は要切替！
   });
