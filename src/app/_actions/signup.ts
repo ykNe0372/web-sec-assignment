@@ -6,6 +6,7 @@ import { userProfileSchema } from "@/app/_types/UserProfile";
 import type { SignupRequest } from "@/app/_types/SignupRequest";
 import type { UserProfile } from "@/app/_types/UserProfile";
 import type { ServerActionResponse } from "@/app/_types/ServerActionResponse";
+import bcrypt from "bcryptjs";
 
 // ユーザのサインアップのサーバアクション
 export const signupServerAction = async (
@@ -13,7 +14,6 @@ export const signupServerAction = async (
 ): Promise<ServerActionResponse<UserProfile | null>> => {
   try {
     // 入力検証
-    // 💀 現状では日本語のPWも受入れてしまう -> SignupRequest のバリデーション見直し
     const payload = signupRequestSchema.parse(signupRequest);
 
     // 💡スパム登録対策（1秒遅延）
@@ -27,16 +27,16 @@ export const signupServerAction = async (
       // 💀 このアカウントがシステムに存在することを知らせてしまうことになる。
       // 認証メールを送信するなどの方法が望ましい
       return {
-        success: false,
+        success: true,
         payload: null,
-        message: "このメールアドレスは既に使用されています。",
+        // message: "このメールアドレスは既に使用されています。",
+        message: "サインアップ手続きを受け付けました。メールをご確認ください。"
       };
     }
 
     // パスワードのハッシュ化
-    // 💀 ハッシュ化せずにPW保存（ダメ絶対）
-    const hashedPassword = payload.password;
-    // const hashedPassword = await bcrypt.hash(payload.password, 10);
+    // const hashedPassword = payload.password;
+    const hashedPassword = await bcrypt.hash(payload.password, 10);
 
     // ユーザの作成
     const user = await prisma.user.create({
@@ -48,7 +48,6 @@ export const signupServerAction = async (
     });
 
     // レスポンスの生成
-    // 💀 パスワードは無論、不要な情報はレスポンスしない。
     const res: ServerActionResponse<UserProfile> = {
       success: true,
       payload: userProfileSchema.parse(user), // 余分なプロパティを削除,
@@ -61,10 +60,8 @@ export const signupServerAction = async (
     return {
       success: false,
       payload: null,
-      message: errorMsg,
-      // 💀 エラーメッセージはユーザに見せない方が良い
-      // システム内部構造や依存関係をユーザに漏らす可能性がある
-      // message: "サインアップのサーバサイドの処理に失敗しました。",
+      // message: errorMsg,
+      message: "サインアップのサーバサイドの処理に失敗しました。",
     };
   }
 };

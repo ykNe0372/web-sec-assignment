@@ -3,6 +3,7 @@
 import { v4 as uuid } from "uuid";
 import { PrismaClient, Role } from "@prisma/client";
 import { UserSeed, userSeedSchema } from "../src/app/_types/UserSeed";
+import bcrypt from "bcryptjs";
 
 const prisma = new PrismaClient();
 
@@ -61,13 +62,20 @@ async function main() {
     throw error;
   }
 
+  const hashedUserSeeds = await Promise.all(
+    userSeeds.map(async (userSeed) => ({
+      ...userSeed,
+      password: await bcrypt.hash(userSeed.password, 10),
+    }))
+  );
+
   // 各テーブルの全レコードを削除
   await prisma.user.deleteMany();
   await prisma.session.deleteMany();
 
   // ユーザ（user）テーブルにテストデータを挿入
   await prisma.user.createMany({
-    data: userSeeds.map((userSeed) => ({
+    data: hashedUserSeeds.map((userSeed) => ({
       id: uuid(),
       name: userSeed.name,
       password: userSeed.password,
